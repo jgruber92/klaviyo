@@ -24,7 +24,6 @@ def getAllCitiesInList():
 getAllCitiesInList()
 
 
-"""
 def updateProfile(attribute, value):
     client.Profiles.update_profile(PERSON_ID, {attribute: value})
 
@@ -102,4 +101,3 @@ updateProfile("city", "Seattle")
 location = getProfileLocation()
 isItRaining(location)
 rainingMessage(location)
-"""
