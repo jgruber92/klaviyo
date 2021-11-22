@@ -1,6 +1,5 @@
 import klaviyo
 import requests
-import json
 
 PRIVATE_KEY = "pk_34a431d058e507565efb49b1e550cfad3e"
 PUBLIC_KEY = "WjsNyD"
@@ -36,7 +35,7 @@ def getProfile():
     print(response.text)
 
 
-def getIdentity(email, city):
+def getIdentity():
     identity_url = "https://a.klaviyo.com/api/identify"
     identity_payload = {
         "token": "PUBLIC_KEY",
@@ -49,29 +48,29 @@ def getIdentity(email, city):
         },
     }
 
-    identityHeaders = {
+    identity_Headers = {
         "Accept": "text/html",
         "Content-Type": "application/json",
     }
 
     response = requests.request(
-        "POST", identity_url, data=identity_payload, headers=identityHeaders
+        "POST", identity_url, data=identity_payload, headers=identity_Headers
     )
 
     print(response.status_code)
 
 
-def listToString(s):
-    str = ""
-    return str.join(s)
+def list_to_string(s):
+    string = ""
+    return string.join(s)
 
 
-def isItRaining(location):
-    params = {"access_key": WEATHERSTACK_ACCESS_KEY, "query": location}
+def is_it_raining(is_it_raining_location):
+    params = {"access_key": WEATHERSTACK_ACCESS_KEY, "query": is_it_raining_location}
     current_weather = requests.get("http://api.weatherstack.com/current", params)
     weather_api_response = current_weather.json()
     weather_list = weather_api_response["current"]["weather_descriptions"]
-    weather = listToString(weather_list)
+    weather = list_to_string(weather_list)
 
     if "Rain" in weather:
         return True
@@ -91,13 +90,16 @@ def getProfileLocation():
     return value_list
 
 
-def rainingMessage(location):
-    print("It's raining in" + location) if isItRaining(location) == True else print(
-        "It's not raining in " + location
+def raining_message(message_location):
+    message = (
+        ("It's raining in" + message_location)
+        if is_it_raining(location) == True
+        else print("It's not raining in " + location)
     )
+    print(message)
 
 
 updateProfile("city", "Seattle")
 location = getProfileLocation()
-isItRaining(location)
-rainingMessage(location)
+is_it_raining(location)
+raining_message(location)
