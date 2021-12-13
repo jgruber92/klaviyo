@@ -1,4 +1,4 @@
-# Gruber Current Weather Email
+# Gruber Klaviyo Demo
 
 The objective of this script is to send targeted emails to customers based off of the current whether in their location. The idea behind this is that there is a demand for industries such as outdoor stores, fashion, hardware, etc. based on the weather or season. What better time to sell to a customer than right before a snowstorm or a big rain storm when they are in need of a product such as an umbrella or a snow shovel. We want to make sure that our customers are the first ones to reach out to ensure their customers buy these products from them.
 
