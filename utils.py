@@ -52,7 +52,7 @@ def getSegmentMembersLocation():
         i += 1
         profile_id = ""
 
-    print(profile_location_list)
+    return profile_location_list
 
 
 # Returns a list of the emails for each member in a segment
@@ -72,28 +72,7 @@ def getSegmentMembersEmail():
         i += 1
         profile_email = ""
 
-    print(profile_email_list)
-
-
-# Returns a list of the emails for each member in a segment
-def getSegmentMembersId():
-    url = BASE_URL + "v2/group/" + SEGMENT_ID + "/members/all?api_key=" + PRIVATE_KEY
-    i = 0
-    profile_id_list = []
-
-    headers = {"cache-control": "no-cache"}
-    response = requests.request("GET", url, headers=headers)
-    records = response.json()
-    r_dict = records["records"]
-
-    while i < (len(r_dict)):
-        profile_id = r_dict[i].get("id")
-        profile_id_list.append(profile_id)
-        i += 1
-        profile_id = ""
-
-    print(profile_id_list)
-    return profile_id_list
+    return profile_email_list
 
 
 # Returns the location of a profile
@@ -106,25 +85,6 @@ def getProfileLocation(person_id):
     location = profile["$city"]
 
     return location
-
-
-def getProfileEmail(profileId):
-    url = BASE_URL + "v1/person/" + profileId
-
-    querystring = {"api_key": PRIVATE_KEY}
-
-    payload = ""
-    headers = {
-        "cache-control": "no-cache",
-    }
-
-    response = requests.request(
-        "GET", url, data=payload, headers=headers, params=querystring
-    )
-    r_dict = response.json()
-    profile_email = r_dict["$email"]
-
-    print(profile_email)
 
 
 # Converts a list to a string
@@ -170,5 +130,15 @@ def trackProfileWeather(email, location):
 
     response = requests.request("POST", url, data=payload, headers=headers)
 
-    print(response.text)
-    print(weather)
+
+def weatherScript():
+    i = 0
+    emails = getSegmentMembersEmail()
+    locations = getSegmentMembersLocation()
+
+    print(emails)
+    print(locations)
+
+    while i < len(emails):
+        trackProfileWeather(emails[i], locations[i])
+        i += 1
