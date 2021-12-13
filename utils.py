@@ -1,6 +1,5 @@
 import klaviyo
 import requests
-import json
 import keys
 
 PRIVATE_KEY = keys.PRIVATE_KEY
@@ -12,7 +11,7 @@ SEGMENT_ID = "Xw5kWt"
 
 client = klaviyo.Klaviyo(public_token=PUBLIC_KEY, private_token=PRIVATE_KEY)
 
-
+# Creates a profile
 def identify(email, city):
     url = BASE_URL + "identify"
 
@@ -35,49 +34,141 @@ def identify(email, city):
     print(response.text)
 
 
-def getSegmentMembers():
+# Returns a list of the locations of all the profiles in a segment
+def getSegmentMembersLocation():
     url = BASE_URL + "v2/group/" + SEGMENT_ID + "/members/all?api_key=" + PRIVATE_KEY
+    i = 0
+    profile_location_list = []
 
     headers = {"cache-control": "no-cache"}
     response = requests.request("GET", url, headers=headers)
+    records = response.json()
+    r_dict = records["records"]
+
+    while i < (len(r_dict)):
+        profile_id = r_dict[i].get("id")
+        location = getProfileLocation(profile_id)
+        profile_location_list.append(location)
+        i += 1
+        profile_id = ""
+
+    print(profile_location_list)
+
+
+# Returns a list of the emails for each member in a segment
+def getSegmentMembersEmail():
+    url = BASE_URL + "v2/group/" + SEGMENT_ID + "/members/all?api_key=" + PRIVATE_KEY
+    i = 0
+    profile_email_list = []
+
+    headers = {"cache-control": "no-cache"}
+    response = requests.request("GET", url, headers=headers)
+    records = response.json()
+    r_dict = records["records"]
+
+    while i < (len(r_dict)):
+        profile_email = r_dict[i].get("email")
+        profile_email_list.append(profile_email)
+        i += 1
+        profile_email = ""
+
+    print(profile_email_list)
+
+
+# Returns a list of the emails for each member in a segment
+def getSegmentMembersId():
+    url = BASE_URL + "v2/group/" + SEGMENT_ID + "/members/all?api_key=" + PRIVATE_KEY
+    i = 0
+    profile_id_list = []
+
+    headers = {"cache-control": "no-cache"}
+    response = requests.request("GET", url, headers=headers)
+    records = response.json()
+    r_dict = records["records"]
+
+    while i < (len(r_dict)):
+        profile_id = r_dict[i].get("id")
+        profile_id_list.append(profile_id)
+        i += 1
+        profile_id = ""
+
+    print(profile_id_list)
+    return profile_id_list
+
+
+# Returns the location of a profile
+def getProfileLocation(person_id):
+    url = BASE_URL + "v1/person/" + person_id + "?api_key=" + PRIVATE_KEY
+    headers = {"Accept": "application/json"}
+    response = requests.request("GET", url, headers=headers)
+
+    profile = response.json()
+    location = profile["$city"]
+
+    return location
+
+
+def getProfileEmail(profileId):
+    url = BASE_URL + "v1/person/" + profileId
+
+    querystring = {"api_key": PRIVATE_KEY}
+
+    payload = ""
+    headers = {
+        "cache-control": "no-cache",
+    }
+
+    response = requests.request(
+        "GET", url, data=payload, headers=headers, params=querystring
+    )
     r_dict = response.json()
-    print(r_dict)
+    profile_email = r_dict["$email"]
+
+    print(profile_email)
 
 
-def trackWeather():
+# Converts a list to a string
+def listToString(list_to_convert):
+    string = "".join(list_to_convert)
+    return string
+
+
+# Returns the current weather for each profile in a segment
+def getWeather(city):
+    url = "http://api.weatherstack.com/current"
+
+    querystring = {"access_key": WEATHERSTACK_ACCESS_KEY, "query": city}
+
+    payload = ""
+    headers = {"cache-control": "no-cache"}
+
+    response = requests.request(
+        "GET", url, data=payload, headers=headers, params=querystring
+    )
+
+    weather_dict = response.json()
+
+    return listToString(weather_dict["current"]["weather_descriptions"])
+
+
+# Tracks a weather event for each profile in a segment based on their email
+def trackProfileWeather(email, location):
     url = "https://a.klaviyo.com/api/track"
-
-    payload = '{\n  "token": "WjsNyD",\n  "event": "Weather Update",\n  "customer_properties": {\n    "$email": "jefferson.gruber92+boston.com",\n    "precipitation": "Rain"\n  }\n}'
-    headers = {"Content-Type": "application/json"}
+    weather = getWeather(location)
+    payload = (
+        '{"token":"'
+        + PUBLIC_KEY
+        + '","event":"Weather Update","customer_properties": {"$email":"'
+        + email
+        + '"},"properties": {"current_weather":"'
+        + weather
+        + '"}}'
+    )
+    headers = {
+        "Content-Type": "application/json",
+    }
 
     response = requests.request("POST", url, data=payload, headers=headers)
 
     print(response.text)
-
-
-def getProfile():
-    identity_url = "https://a.klaviyo.com/api/identify"
-    identity_payload = {
-        "token": "WjsNyD",
-        "properties": {"$email": "jefferson.gruber92+austin@gmail.com"},
-    }
-
-    identity_Headers = {
-        "Accept": "text/html",
-        "Content-Type": "application/json",
-    }
-
-    response = requests.request(
-        "POST", identity_url, data=identity_payload, headers=identity_Headers
-    )
-
-    print(response.text)
-
-
-def getProfileLocation():
-    url = "https://a.klaviyo.com/api/v1/person/01FPJR3P41DPTP84GZ5V90H198"
-    querystring = {"api_key": PRIVATE_KEY}
-    headers = {"Accept": "application/json"}
-    response = requests.request("GET", url, headers=headers, params=querystring)
-    json_response = response.json
-    print(json_response["$city"])
+    print(weather)
