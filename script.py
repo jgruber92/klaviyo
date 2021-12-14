@@ -1,3 +1,3 @@
-import utils
+import methods
 
-utils.weatherScript()
+methods.weatherScript()

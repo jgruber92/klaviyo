@@ -1,20 +1,25 @@
 import klaviyo
 import requests
+
+# I've imported the keys module where I store my access key.
+# I've added this to the .gitignore file so they are not public in github
 import keys
 
-# I've imported the keys module where I store my access key. I've added this to the .gitignore file so they are not public in github
 PRIVATE_KEY = keys.PRIVATE_KEY
 PUBLIC_KEY = keys.PUBLIC_KEY
 PERSON_ID = keys.PERSON_ID
 WEATHERSTACK_ACCESS_KEY = keys.WEATHERSTACK_ACCESS_KEY
 BASE_URL = "https://a.klaviyo.com/api/"
 
-# I'm currently thinking about ways to not have this be hardcoded. In this example I only need to use 1 segment which is why it's hardcoded right now. In other scenarios such as more specific criteria for a specific flow, you may want to dynamically choose a segment and it would not longer make snese to hardcode this
+# Even though it is bad practice to hardcode this, I only need to use 1 segment which is why it's hardcoded
+# right now. In other scenarios where you would be using one of many segments, you
+# would want to dynamically choose a segment and it would not longer make sense to hardcode this.
 SEGMENT_ID = "Xw5kWt"
 
 client = klaviyo.Klaviyo(public_token=PUBLIC_KEY, private_token=PRIVATE_KEY)
 
-# Creates a new profile
+# Creates a new profile - I will use this during the demo manually to represent a new profile
+# being created. It's not used in the script though
 def identify(email, city):
     url = BASE_URL + "identify"
 
@@ -95,7 +100,7 @@ def getProfileLocation(person_id):
     return location
 
 
-# Converts a list to a string
+# Basic utility function that converts a list to a string
 def listToString(list_to_convert):
     string = "".join(list_to_convert)
     return string
@@ -142,7 +147,7 @@ def trackWeatherUpdate(email, location):
     response = requests.request("POST", url, data=payload, headers=headers)
 
 
-# Track the weather for all profiles with a location associated
+# The main script that tracks the weather for all profiles with a location associated
 def weatherScript():
     i = 0
     emails = getSegmentMembersEmail()
